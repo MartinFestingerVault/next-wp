@@ -8,7 +8,7 @@ import Image from "next/image";
 // Removed date-fns dependency
 import type { Metadata } from "next";
 
-// eslint-disable-next-line react/no-unescaped-entities
+ eslint-disable-next-line react/no-unescaped-entities
 
 
 
