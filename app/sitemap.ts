@@ -1,55 +1,57 @@
+// app/sitemap.ts
+
 import { MetadataRoute } from "next";
-import { getAllPosts } from "@/lib/wordpress";
-import { siteConfig } from "@/site.config";
+import { site_domain } from "@/site.config";
+import { getAllPosts, getAllPages, getAllPlugins } from "@/lib/wordpress";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const posts = await getAllPosts();
-
-  const staticUrls: MetadataRoute.Sitemap = [
+  // Fetch all content
+  const [posts, pages, plugins] = await Promise.all([
+    getAllPosts(),
+    getAllPages(),
+    getAllPlugins(),
+  ]);
+  
+  // Create sitemap entries
+  return [
     {
-      url: `${siteConfig.site_domain}`,
+      url: `https://${site_domain}`,
       lastModified: new Date(),
-      changeFrequency: "yearly",
+      changeFrequency: "daily",
       priority: 1,
     },
     {
-      url: `${siteConfig.site_domain}/posts`,
+      url: `https://${site_domain}/posts`,
       lastModified: new Date(),
-      changeFrequency: "weekly",
+      changeFrequency: "daily",
       priority: 0.8,
     },
     {
-      url: `${siteConfig.site_domain}/pages`,
+      url: `https://${site_domain}/plugins`,
       lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.5,
+      changeFrequency: "daily",
+      priority: 0.8,
     },
-    {
-      url: `${siteConfig.site_domain}/authors`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `${siteConfig.site_domain}/categories`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `${siteConfig.site_domain}/tags`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
+    // Map post URLs
+    ...posts.map((post) => ({
+      url: `https://${site_domain}/posts/${post.slug}`,
+      lastModified: new Date(post.modified),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
+    // Map page URLs
+    ...pages.map((page) => ({
+      url: `https://${site_domain}/pages/${page.slug}`,
+      lastModified: new Date(page.modified),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
+    // Map plugin URLs
+    ...plugins.map((plugin) => ({
+      url: `https://${site_domain}/plugins/${plugin.slug}`,
+      lastModified: new Date(plugin.modified),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
   ];
-
-  const postUrls: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `${siteConfig.site_domain}/posts/${post.slug}`,
-    lastModified: new Date(post.modified),
-    changeFrequency: "weekly",
-    priority: 0.5,
-  }));
-
-  return [...staticUrls, ...postUrls];
 }
