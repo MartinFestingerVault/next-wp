@@ -5,7 +5,7 @@ import { siteConfig } from "@/site.config";
 import Balancer from "react-wrap-balancer";
 import Link from "next/link";
 import Image from "next/image";
-import { formatDistanceToNow } from "date-fns";
+// Removed date-fns dependency
 import type { Metadata } from "next";
 
 export async function generateStaticParams() {
@@ -83,7 +83,32 @@ export default async function PluginDetailPage({
     year: "numeric",
   });
 
-  const updatedTimeAgo = formatDistanceToNow(new Date(plugin.modified), { addSuffix: true });
+  // Format relative time without date-fns
+  const getRelativeTimeString = (date) => {
+    const now = new Date();
+    const past = new Date(date);
+    const diffInMs = now.getTime() - past.getTime();
+    
+    const diffInSecs = Math.floor(diffInMs / 1000);
+    const diffInMins = Math.floor(diffInSecs / 60);
+    const diffInHours = Math.floor(diffInMins / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+    const diffInMonths = Math.floor(diffInDays / 30);
+    
+    if (diffInMonths > 0) {
+      return diffInMonths === 1 ? '1 month ago' : `${diffInMonths} months ago`;
+    } else if (diffInDays > 0) {
+      return diffInDays === 1 ? '1 day ago' : `${diffInDays} days ago`;
+    } else if (diffInHours > 0) {
+      return diffInHours === 1 ? '1 hour ago' : `${diffInHours} hours ago`;
+    } else if (diffInMins > 0) {
+      return diffInMins === 1 ? '1 minute ago' : `${diffInMins} minutes ago`;
+    } else {
+      return 'just now';
+    }
+  };
+  
+  const updatedTimeAgo = getRelativeTimeString(plugin.modified);
   
   // Extract meta information
   const version = plugin.meta?.version || "1.0.0";
