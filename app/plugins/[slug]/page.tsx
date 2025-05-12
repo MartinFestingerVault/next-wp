@@ -6,7 +6,6 @@ import Balancer from "react-wrap-balancer";
 import Link from "next/link";
 import type { Metadata } from "next";
 
-// Only define the params as non-promised
 export async function generateStaticParams() {
   const plugins = await getAllFvPlugins();
   return plugins.map((plugin: FvPlugin) => ({
@@ -14,13 +13,13 @@ export async function generateStaticParams() {
   }));
 }
 
-// Remove the Promise type from params
+// Match the exact type signature from your original code
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
   const plugin = await getFvPluginBySlug(slug);
   
   if (!plugin) {
@@ -58,13 +57,13 @@ export async function generateMetadata({
   };
 }
 
-// Remove the Promise type from params
+// Match the exact type signature from your original code
 export default async function PluginDetailPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const { slug } = params;
+  const { slug } = await params;
   const plugin = await getFvPluginBySlug(slug);
   
   if (!plugin) {
