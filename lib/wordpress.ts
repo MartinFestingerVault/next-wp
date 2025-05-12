@@ -236,3 +236,63 @@ export async function searchAuthors(query: string): Promise<Author[]> {
 }
 
 export { WordPressAPIError };
+
+// Add these functions at the end of the file
+
+// FV Plugins
+export async function getAllFvPlugins() {
+  try {
+    const response = await fetch(
+      `${process.env.WORDPRESS_URL}/wp-json/wp/v2/fv_plugin?per_page=100`,
+      {
+        ...defaultFetchOptions,
+        next: {
+          tags: ["wordpress", "fv_plugins"],
+        },
+      }
+    );
+    
+    if (!response.ok) {
+      throw new WordPressAPIError(
+        `Failed to fetch FV plugins. Status: ${response.status}`,
+        response.status,
+        "fv_plugin"
+      );
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching FV plugins:", error);
+    throw error;
+  }
+}
+
+export async function getFvPluginBySlug(slug: string) {
+  try {
+    const response = await fetch(
+      `${process.env.WORDPRESS_URL}/wp-json/wp/v2/fv_plugin?slug=${slug}`,
+      {
+        ...defaultFetchOptions,
+        next: {
+          tags: ["wordpress", "fv_plugins"],
+        },
+      }
+    );
+    
+    if (!response.ok) {
+      throw new WordPressAPIError(
+        `Failed to fetch FV plugin by slug ${slug}. Status: ${response.status}`,
+        response.status,
+        `fv_plugin?slug=${slug}`
+      );
+    }
+    
+    const data = await response.json();
+    return data[0];
+  } catch (error) {
+    console.error(`Error fetching FV plugin by slug ${slug}:`, error);
+    throw error;
+  }
+}
+
+// Add similar functions for FV Themes, Template Kits, and Requests
