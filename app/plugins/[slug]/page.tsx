@@ -5,9 +5,32 @@ import { siteConfig } from "@/site.config";
 import Balancer from "react-wrap-balancer";
 import type { Metadata } from "next";
 
+// Define FvPlugin interface to match the type returned by getAllFvPlugins
+interface FvPlugin {
+  id: number;
+  slug: string;
+  title: {
+    rendered: string;
+  };
+  content: {
+    rendered: string;
+  };
+  excerpt?: {
+    rendered: string;
+  };
+  meta?: {
+    version?: string;
+    custom_product_name?: string;
+    custom_product_url?: string;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
 export async function generateStaticParams() {
   const plugins = await getAllFvPlugins();
-  return plugins.map((plugin) => ({
+  // Add explicit type to the plugin parameter
+  return plugins.map((plugin: FvPlugin) => ({
     slug: plugin.slug,
   }));
 }
