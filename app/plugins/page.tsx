@@ -1,5 +1,4 @@
 // app/plugins/page.tsx
-import { Suspense } from "react";
 import { Metadata } from "next";
 import { PluginSearch } from "@/components/plugins/plugin-search";
 import { FilterPlugins } from "@/components/plugins/plugin-filter";
@@ -12,14 +11,10 @@ import {
   getAllTags 
 } from "@/lib/wordpress";
 
-interface PluginsPageProps {
-  searchParams: {
-    search?: string;
-    access_level?: string;
-    category?: string;
-    original_author?: string;
-    tag?: string;
-  };
+// Update the props interface to match Next.js expectations
+interface PageProps {
+  params: { [key: string]: string | string[] };
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
 export const metadata: Metadata = {
@@ -27,8 +22,13 @@ export const metadata: Metadata = {
   description: "Browse our collection of premium WordPress plugins",
 };
 
-export default async function PluginsPage({ searchParams }: PluginsPageProps) {
-  const { search, access_level, category, original_author, tag } = searchParams;
+export default async function PluginsPage({ searchParams }: PageProps) {
+  // Convert searchParams to the expected format
+  const search = searchParams.search as string | undefined;
+  const access_level = searchParams.access_level as string | undefined;
+  const category = searchParams.category as string | undefined;
+  const original_author = searchParams.original_author as string | undefined;
+  const tag = searchParams.tag as string | undefined;
   
   // Fetch data in parallel
   const [plugins, accessLevels, categories, originalAuthors, tags] = await Promise.all([
