@@ -231,42 +231,71 @@ export interface FilterBarProps {
   onCategoryChange?: (categoryId: Category["id"] | undefined) => void;
 }
 
-interface FvPlugin extends WPEntity {
+interface FVPlugin extends WPEntity {
   title: RenderedTitle;
   content: RenderedContent;
   excerpt: RenderedContent;
+  featured_media: number;
+  // Custom fields from meta boxes
   meta: {
     is_fork: string;
     is_done: string;
     version: string;
+    old_item_id: string;
+    // Custom fields
     custom_product_name: string;
+    custom_slug: string;
     custom_product_url: string;
-    // Add other meta fields as needed
+    custom_short_description: string;
+    custom_author: string;
+    custom_author_url: string;
+    custom_text_domain: string;
+    custom_domain_path: string;
+    custom_license: string;
+    custom_license_url: string;
+    custom_license_text: string;
+    custom_requires_at_least: string;
+    custom_required_php_version: string;
+    custom_tested_up_to: string;
+    custom_stable_tag: string;
+    custom_wc_requires_at_least: string;
+    custom_wc_tested_up_to: string;
+    custom_wc_stable_tag: string;
+    custom_contributors: string;
+    custom_donate_link: string;
+    custom_long_description: string;
+    custom_installation: string;
+    custom_faq: string;
+    custom_screenshots: string;
+    custom_copyright: string;
+    custom_Third_Party_Resources: string;
+    custom_changelog: string;
+    // Original fields
+    original_product_name: string;
+    original_slug: string;
+    original_product_url: string;
+    // ...etc. (similar to custom fields)
   };
+  // Taxonomies
+  fv_access_level: number[];
+  fv_category: number[];
+  original_author_tax: number[];
+  fv_tag: number[];
 }
 
-interface FvTheme extends WPEntity {
-  title: RenderedTitle;
-  content: RenderedContent;
-  excerpt: RenderedContent;
-  meta: {
-    // Same meta fields as FvPlugin
-  };
+// Add taxonomy interfaces
+interface FVAccessLevel extends Taxonomy {
+  // Additional properties specific to access levels if any
 }
 
-interface FvTemplateKit extends WPEntity {
-  title: RenderedTitle;
-  content: RenderedContent;
-  excerpt: RenderedContent;
-  meta: {
-    // Same meta fields as FvPlugin
-  };
+interface FVCategory extends Taxonomy {
+  // Additional properties specific to categories if any
 }
 
-interface FvRequest extends WPEntity {
-  title: RenderedTitle;
-  content: RenderedContent;
-  meta: {
-    // Request-specific meta fields
-  };
+interface FVOriginalAuthor extends Taxonomy {
+  // Additional properties specific to original authors if any
+}
+
+interface FVTag extends Term {
+  // Additional properties specific to tags if any
 }
