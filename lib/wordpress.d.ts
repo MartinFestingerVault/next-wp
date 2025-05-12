@@ -230,3 +230,43 @@ export interface FilterBarProps {
   onTagChange?: (tagId: Tag["id"] | undefined) => void;
   onCategoryChange?: (categoryId: Category["id"] | undefined) => void;
 }
+
+interface FvPlugin extends WPEntity {
+  title: RenderedTitle;
+  content: RenderedContent;
+  excerpt: RenderedContent;
+  meta: {
+    is_fork: string;
+    is_done: string;
+    version: string;
+    custom_product_name: string;
+    custom_product_url: string;
+    // Add other meta fields as needed
+  };
+}
+
+interface FvTheme extends WPEntity {
+  title: RenderedTitle;
+  content: RenderedContent;
+  excerpt: RenderedContent;
+  meta: {
+    // Same meta fields as FvPlugin
+  };
+}
+
+interface FvTemplateKit extends WPEntity {
+  title: RenderedTitle;
+  content: RenderedContent;
+  excerpt: RenderedContent;
+  meta: {
+    // Same meta fields as FvPlugin
+  };
+}
+
+interface FvRequest extends WPEntity {
+  title: RenderedTitle;
+  content: RenderedContent;
+  meta: {
+    // Request-specific meta fields
+  };
+}
