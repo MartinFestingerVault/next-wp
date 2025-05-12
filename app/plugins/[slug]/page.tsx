@@ -1,67 +1,115 @@
 import { getFvPluginBySlug, getAllFvPlugins } from "@/lib/wordpress";
 import { notFound } from "next/navigation";
-import { Metadata } from "next";
+import { Section, Container, Article, Prose } from "@/components/craft";
+import { siteConfig } from "@/site.config";
+import Balancer from "react-wrap-balancer";
+import type { Metadata } from "next";
 
-// Generate static params for all plugins
 export async function generateStaticParams() {
   const plugins = await getAllFvPlugins();
-  return plugins.map((plugin) => ({ slug: plugin.slug }));
+  return plugins.map((plugin) => ({
+    slug: plugin.slug,
+  }));
 }
 
-// Use the Next.js standard way without custom types
-export default async function PluginPage({
+export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
-}) {
-  const plugin = await getFvPluginBySlug(params.slug);
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const plugin = await getFvPluginBySlug(slug);
+  
+  if (!plugin) {
+    return {};
+  }
+  
+  const ogUrl = new URL(`${siteConfig.site_domain}/api/og`);
+  ogUrl.searchParams.append("title", plugin.title.rendered);
+  // Strip HTML tags for description
+  const description = plugin.excerpt?.rendered?.replace(/<[^>]*>/g, "").trim() || "";
+  ogUrl.searchParams.append("description", description);
+  
+  return {
+    title: plugin.title.rendered,
+    description: description,
+    openGraph: {
+      title: plugin.title.rendered,
+      description: description,
+      type: "article",
+      url: `${siteConfig.site_domain}/plugins/${plugin.slug}`,
+      images: [
+        {
+          url: ogUrl.toString(),
+          width: 1200,
+          height: 630,
+          alt: plugin.title.rendered,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: plugin.title.rendered,
+      description: description,
+      images: [ogUrl.toString()],
+    },
+  };
+}
 
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const plugin = await getFvPluginBySlug(slug);
+  
   if (!plugin) {
     return notFound();
   }
 
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">{plugin.title.rendered}</h1>
-      <div 
-        className="prose max-w-none"
-        dangerouslySetInnerHTML={{ __html: plugin.content.rendered }}
-      />
-      {/* Display meta fields if available */}
-      {plugin.meta && (
-        <div className="mt-8 bg-gray-100 p-4 rounded-lg">
-          <h2 className="text-xl font-semibold mb-4">Plugin Details</h2>
-          <ul className="space-y-2">
-            {plugin.meta.custom_product_name && (
-              <li><strong>Product Name:</strong> {plugin.meta.custom_product_name}</li>
-            )}
-            {plugin.meta.version && (
-              <li><strong>Version:</strong> {plugin.meta.version}</li>
-            )}
-            {/* Add other meta fields as needed */}
-          </ul>
-        </div>
-      )}
-    </div>
+    <Section>
+      <Container>
+        <Prose>
+          <h1>
+            <Balancer>
+              <span
+                dangerouslySetInnerHTML={{ __html: plugin.title.rendered }}
+              ></span>
+            </Balancer>
+          </h1>
+        </Prose>
+        <Article dangerouslySetInnerHTML={{ __html: plugin.content.rendered }} />
+        
+        {/* Plugin Meta Information */}
+        {plugin.meta && (
+          <div className="mt-8 p-6 bg-accent/10 rounded-lg">
+            <h2 className="text-xl font-semibold mb-4">Plugin Details</h2>
+            <ul className="space-y-3">
+              {plugin.meta.custom_product_name && (
+                <li><strong>Product Name:</strong> {plugin.meta.custom_product_name}</li>
+              )}
+              {plugin.meta.version && (
+                <li><strong>Version:</strong> {plugin.meta.version}</li>
+              )}
+              {plugin.meta.custom_product_url && (
+                <li>
+                  <strong>Product URL:</strong> 
+                  <a 
+                    href={plugin.meta.custom_product_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="ml-2 text-primary hover:underline"
+                  >
+                    {plugin.meta.custom_product_url}
+                  </a>
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
+      </Container>
+    </Section>
   );
-}
-
-// Optional: Generate metadata for the page
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}): Promise<Metadata> {
-  const plugin = await getFvPluginBySlug(params.slug);
-  
-  if (!plugin) {
-    return {
-      title: 'Plugin Not Found',
-    };
-  }
-  
-  return {
-    title: plugin.title.rendered,
-    description: plugin.excerpt?.rendered || '',
-  };
 }
