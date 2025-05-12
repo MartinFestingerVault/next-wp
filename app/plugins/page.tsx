@@ -1,28 +1,23 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { 
-  getAllFVPlugins, 
-  getFeaturedMediaById 
-} from "@/lib/wordpress";
+import { getAllFVPlugins, getFeaturedMediaById } from "@/lib/wordpress";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "WordPress Plugins | Festinger Vault",
   description: "Browse our collection of premium WordPress plugins",
 };
 
-// Use the precise Next.js 15.3 type signature
-export default async function Page({
-  searchParams
-}: {
-  searchParams?: { [key: string]: string | string[] | undefined };
-}) {
-  // Extract search parameters with proper type handling
-  const search = typeof searchParams?.search === 'string' ? searchParams.search : undefined;
-  const access_level = typeof searchParams?.access_level === 'string' ? searchParams.access_level : undefined;
-  const category = typeof searchParams?.category === 'string' ? searchParams.category : undefined;
-  const original_author = typeof searchParams?.original_author === 'string' ? searchParams.original_author : undefined;
-  const tag = typeof searchParams?.tag === 'string' ? searchParams.tag : undefined;
+// Remove all type annotations
+export default async function Page(props) {
+  const searchParams = props.searchParams || {};
+  
+  // Extract search parameters
+  const search = typeof searchParams.search === 'string' ? searchParams.search : undefined;
+  const access_level = typeof searchParams.access_level === 'string' ? searchParams.access_level : undefined;
+  const category = typeof searchParams.category === 'string' ? searchParams.category : undefined;
+  const original_author = typeof searchParams.original_author === 'string' ? searchParams.original_author : undefined;
+  const tag = typeof searchParams.tag === 'string' ? searchParams.tag : undefined;
   
   // Fetch plugins with any provided filters
   const plugins = await getAllFVPlugins({ 
@@ -58,7 +53,7 @@ export default async function Page({
 }
 
 // Simple plugin card component
-async function PluginCard({ plugin }: { plugin: any }) {
+async function PluginCard({ plugin }) {
   // Fetch featured media if available
   let featuredMedia = null;
   if (plugin.featured_media) {
