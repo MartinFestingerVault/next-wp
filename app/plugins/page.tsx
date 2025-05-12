@@ -3,32 +3,26 @@ import Link from "next/link";
 import Image from "next/image";
 import { 
   getAllFVPlugins, 
-  getFVAccessLevels, 
-  getFVCategories,
-  getFVOriginalAuthors,
-  getFVTags,
-  getFeaturedMediaById
+  getFeaturedMediaById 
 } from "@/lib/wordpress";
-import { Badge } from "@/components/ui/badge";
-
-// Fix: Update the PageProps interface to align with Next.js app router expectations
-interface PageProps {
-  // Remove the params property from PageProps since it's not needed in the component signature
-  searchParams: { [key: string]: string | string[] | undefined };
-}
 
 export const metadata: Metadata = {
   title: "WordPress Plugins | Festinger Vault",
   description: "Browse our collection of premium WordPress plugins",
 };
 
-// Fix: Change the function signature to match the expected type by Next.js
-export default async function PluginsPage({ searchParams }: PageProps) {
-  const search = searchParams.search as string | undefined;
-  const access_level = searchParams.access_level as string | undefined;
-  const category = searchParams.category as string | undefined;
-  const original_author = searchParams.original_author as string | undefined;
-  const tag = searchParams.tag as string | undefined;
+// Use the precise Next.js 15.3 type signature
+export default async function Page({
+  searchParams
+}: {
+  searchParams?: { [key: string]: string | string[] | undefined };
+}) {
+  // Extract search parameters with proper type handling
+  const search = typeof searchParams?.search === 'string' ? searchParams.search : undefined;
+  const access_level = typeof searchParams?.access_level === 'string' ? searchParams.access_level : undefined;
+  const category = typeof searchParams?.category === 'string' ? searchParams.category : undefined;
+  const original_author = typeof searchParams?.original_author === 'string' ? searchParams.original_author : undefined;
+  const tag = typeof searchParams?.tag === 'string' ? searchParams.tag : undefined;
   
   // Fetch plugins with any provided filters
   const plugins = await getAllFVPlugins({ 
@@ -117,9 +111,9 @@ async function PluginCard({ plugin }: { plugin: any }) {
         
         {/* Version Badge */}
         {plugin.meta?.version && (
-          <Badge variant="secondary" className="absolute right-2 top-2">
+          <div className="absolute right-2 top-2 rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-100">
             v{plugin.meta.version}
-          </Badge>
+          </div>
         )}
       </div>
       
