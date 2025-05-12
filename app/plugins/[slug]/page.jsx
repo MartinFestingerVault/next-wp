@@ -4,7 +4,6 @@ import { Section, Container, Article, Prose } from "@/components/craft";
 import { siteConfig } from "@/site.config";
 import Balancer from "react-wrap-balancer";
 import Link from "next/link";
-import Image from "next/image";
 
 export async function generateStaticParams() {
   const plugins = await getAllFvPlugins();
@@ -107,120 +106,6 @@ export default async function PluginDetailPage({ params }) {
   const isFork = plugin.meta?.is_fork === "1";
   const price = plugin.meta?.price || "$49";
   
-  // Plugin features
-  const features = [
-    "Quick and easy setup with intuitive admin interface",
-    "Seamless WordPress integration with one-click installation",
-    "Optimized for performance and speed",
-    "Mobile responsive and works across all devices",
-    "Regular updates and dedicated support",
-    "Comprehensive documentation and video tutorials",
-    "Compatible with major WordPress plugins and themes",
-    "Translation-ready with multilingual support"
-  ];
-  
-  // Plugin benefits
-  const benefits = [
-    {
-      title: "Lightning Fast Performance",
-      description: "Optimized code and intelligent resource loading ensure your site runs at peak speed without sacrificing functionality.",
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      ),
-      bgClass: "bg-blue-100 dark:bg-blue-900",
-    },
-    {
-      title: "Intuitive Interface",
-      description: "User-friendly dashboard with drag-and-drop capabilities make configuration simple for users of all skill levels.",
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-        </svg>
-      ),
-      bgClass: "bg-purple-100 dark:bg-purple-900",
-    },
-    {
-      title: "Advanced Security",
-      description: "Enterprise-grade security features protect your WordPress site from common vulnerabilities and threats.",
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
-      ),
-      bgClass: "bg-amber-100 dark:bg-amber-900",
-    },
-    {
-      title: "Priority Support",
-      description: "Our dedicated support team ensures your questions are answered quickly and issues resolved promptly.",
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-        </svg>
-      ),
-      bgClass: "bg-green-100 dark:bg-green-900",
-    }
-  ];
-
-  // System requirements
-  const requirements = [
-    {
-      title: "WordPress",
-      version: "5.8 or higher",
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-      ),
-      bgClass: "bg-blue-100 dark:bg-blue-900",
-    },
-    {
-      title: "PHP",
-      version: "7.4 or higher",
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-        </svg>
-      ),
-      bgClass: "bg-indigo-100 dark:bg-indigo-900",
-    },
-    {
-      title: "MySQL",
-      version: "5.6 or higher",
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-cyan-600 dark:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-        </svg>
-      ),
-      bgClass: "bg-cyan-100 dark:bg-cyan-900",
-    }
-  ];
-  
-  // FAQ items
-  const faqItems = [
-    {
-      question: "Does this plugin work with the latest WordPress version?",
-      answer: "Yes, this plugin is regularly updated and fully tested with WordPress 6.4. We maintain compatibility with all major WordPress versions, ensuring seamless functionality with updates."
-    },
-    {
-      question: "Can I use this plugin on multiple websites?",
-      answer: "The standard license allows usage on a single website. For multiple sites, you'll need to purchase additional licenses or consider our developer license option, which allows usage on multiple projects."
-    },
-    {
-      question: "How do I get support if I have questions?",
-      answer: "Every purchase includes 6 months of premium support. Simply visit our support portal, submit a ticket, and our dedicated team will assist you with your questions or issues, typically responding within 24 hours."
-    },
-    {
-      question: "Will this plugin slow down my website?",
-      answer: "No, this plugin is optimized for performance. We've carefully developed it with efficiency in mind, using best coding practices to ensure minimal impact on your site's loading speed and server resources."
-    },
-    {
-      question: "Do you offer refunds?",
-      answer: "We offer a 14-day money-back guarantee. If you're not satisfied with the plugin for any reason, contact our support team within 14 days of purchase for a full refund."
-    }
-  ];
-
   // Mock values for display purposes
   const mockDownloads = 1234;
   const mockRating = 4.8;
@@ -331,41 +216,87 @@ export default async function PluginDetailPage({ params }) {
         </div>
       </div>
       
-      {/* Feature Highlights - Alternating Layout with Colorful Icons */}
-      <Section className="py-16 bg-gray-50 dark:bg-gray-900">
+      {/* Feature Highlights Section */}
+      <Section className="py-16 bg-gray-50 dark:bg-gray-900" id="overview">
         <Container>
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4" id="overview">Feature Highlights</h2>
+            <h2 className="text-3xl font-bold mb-4">Feature Highlights</h2>
             <p className="text-muted-foreground">
               Discover what makes {plugin.title.rendered} the premium choice for WordPress users worldwide.
             </p>
           </div>
           
           <div className="grid md:grid-cols-2 gap-12">
-            {benefits.map((benefit, index) => (
-              <div key={index} className="flex flex-col md:flex-row gap-6 items-start">
-                <div className={`w-16 h-16 rounded-2xl ${benefit.bgClass} flex items-center justify-center flex-shrink-0`}>
-                  {benefit.icon}
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2">{benefit.title}</h3>
-                  <p className="text-muted-foreground">
-                    {benefit.description}
-                  </p>
-                </div>
+            {/* Feature 1 */}
+            <div className="flex flex-col md:flex-row gap-6 items-start">
+              <div className="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
               </div>
-            ))}
+              <div>
+                <h3 className="text-xl font-bold mb-2">Lightning Fast Performance</h3>
+                <p className="text-muted-foreground">
+                  Optimized code and intelligent resource loading ensure your site runs at peak speed without sacrificing functionality.
+                </p>
+              </div>
+            </div>
+            
+            {/* Feature 2 */}
+            <div className="flex flex-col md:flex-row gap-6 items-start">
+              <div className="w-16 h-16 rounded-2xl bg-purple-100 dark:bg-purple-900 flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold mb-2">Intuitive Interface</h3>
+                <p className="text-muted-foreground">
+                  User-friendly dashboard with drag-and-drop capabilities make configuration simple for users of all skill levels.
+                </p>
+              </div>
+            </div>
+            
+            {/* Feature 3 */}
+            <div className="flex flex-col md:flex-row gap-6 items-start">
+              <div className="w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-900 flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold mb-2">Advanced Security</h3>
+                <p className="text-muted-foreground">
+                  Enterprise-grade security features protect your WordPress site from common vulnerabilities and threats.
+                </p>
+              </div>
+            </div>
+            
+            {/* Feature 4 */}
+            <div className="flex flex-col md:flex-row gap-6 items-start">
+              <div className="w-16 h-16 rounded-2xl bg-green-100 dark:bg-green-900 flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold mb-2">Priority Support</h3>
+                <p className="text-muted-foreground">
+                  Our dedicated support team ensures your questions are answered quickly and issues resolved promptly.
+                </p>
+              </div>
+            </div>
           </div>
         </Container>
       </Section>
       
-      {/* Main Content Section with Tabs Styling */}
+      {/* Main Content Section with Tabs */}
       <Section className="py-16">
         <Container>
           <div className="flex flex-col lg:flex-row gap-12">
-            {/* Main Content Area (2/3 width) */}
+            {/* Main Content Area */}
             <div className="lg:w-2/3">
-              {/* Custom Tab Navigation */}
+              {/* Tab Navigation */}
               <div className="flex flex-wrap border-b mb-8 overflow-x-auto scrollbar-hide">
                 <a href="#description" className="px-6 py-3 font-medium border-b-2 border-primary -mb-px">Description</a>
                 <a href="#features" className="px-6 py-3 font-medium text-muted-foreground hover:text-foreground transition-colors">Features</a>
@@ -390,7 +321,17 @@ export default async function PluginDetailPage({ params }) {
                 </Prose>
                 
                 <div className="grid md:grid-cols-2 gap-4 mt-8">
-                  {features.map((feature, index) => (
+                  {/* Feature item examples */}
+                  {[
+                    "Quick and easy setup with intuitive admin interface",
+                    "Seamless WordPress integration with one-click installation",
+                    "Optimized for performance and speed",
+                    "Mobile responsive and works across all devices",
+                    "Regular updates and dedicated support",
+                    "Comprehensive documentation and video tutorials",
+                    "Compatible with major WordPress plugins and themes",
+                    "Translation-ready with multilingual support"
+                  ].map((feature, index) => (
                     <div key={index} className="flex items-start p-4 border rounded-lg bg-card/50 hover:bg-card/80 transition-colors">
                       <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3 flex-shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary" viewBox="0 0 20 20" fill="currentColor">
@@ -414,15 +355,38 @@ export default async function PluginDetailPage({ params }) {
                 
                 <div className="not-prose mt-8">
                   <div className="grid md:grid-cols-3 gap-6">
-                    {requirements.map((req, index) => (
-                      <div key={index} className="border rounded-lg p-6 bg-card">
-                        <div className={`w-12 h-12 rounded-full ${req.bgClass} flex items-center justify-center mb-4`}>
-                          {req.icon}
-                        </div>
-                        <h3 className="text-lg font-bold mb-2">{req.title}</h3>
-                        <p className="text-muted-foreground text-sm">{req.version}</p>
+                    {/* WordPress */}
+                    <div className="border rounded-lg p-6 bg-card">
+                      <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
                       </div>
-                    ))}
+                      <h3 className="text-lg font-bold mb-2">WordPress</h3>
+                      <p className="text-muted-foreground text-sm">Version 5.8 or higher</p>
+                    </div>
+                    
+                    {/* PHP */}
+                    <div className="border rounded-lg p-6 bg-card">
+                      <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-bold mb-2">PHP</h3>
+                      <p className="text-muted-foreground text-sm">Version 7.4 or higher</p>
+                    </div>
+                    
+                    {/* MySQL */}
+                    <div className="border rounded-lg p-6 bg-card">
+                      <div className="w-12 h-12 rounded-full bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-cyan-600 dark:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-bold mb-2">MySQL</h3>
+                      <p className="text-muted-foreground text-sm">Version 5.6 or higher</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -504,10 +468,10 @@ export default async function PluginDetailPage({ params }) {
               </div>
             </div>
             
-            {/* Sidebar (1/3 width) */}
+            {/* Sidebar */}
             <div className="lg:w-1/3 space-y-8">
               {/* Plugin Action Card */}
-              <div className="border rounded-xl overflow-hidden bg-card sticky top-24">
+              <div className="border rounded-xl overflow-hidden bg-card">
                 <div className="p-6 border-b">
                   <div className="flex justify-between items-start">
                     <div>
@@ -704,7 +668,7 @@ export default async function PluginDetailPage({ params }) {
         </Container>
       </Section>
       
-      {/* FAQ Section with Accordion-style Appearance */}
+      {/* FAQ Section */}
       <Section className="py-16 bg-gray-50 dark:bg-gray-900">
         <Container>
           <div className="max-w-3xl mx-auto text-center mb-12">
@@ -715,7 +679,28 @@ export default async function PluginDetailPage({ params }) {
           </div>
           
           <div className="max-w-3xl mx-auto divide-y">
-            {faqItems.map((faq, index) => (
+            {[
+              {
+                question: "Does this plugin work with the latest WordPress version?",
+                answer: "Yes, this plugin is regularly updated and fully tested with WordPress 6.4. We maintain compatibility with all major WordPress versions, ensuring seamless functionality with updates."
+              },
+              {
+                question: "Can I use this plugin on multiple websites?",
+                answer: "The standard license allows usage on a single website. For multiple sites, you'll need to purchase additional licenses or consider our developer license option, which allows usage on multiple projects."
+              },
+              {
+                question: "How do I get support if I have questions?",
+                answer: "Every purchase includes 6 months of premium support. Simply visit our support portal, submit a ticket, and our dedicated team will assist you with your questions or issues, typically responding within 24 hours."
+              },
+              {
+                question: "Will this plugin slow down my website?",
+                answer: "No, this plugin is optimized for performance. We've carefully developed it with efficiency in mind, using best coding practices to ensure minimal impact on your site's loading speed and server resources."
+              },
+              {
+                question: "Do you offer refunds?",
+                answer: "We offer a 14-day money-back guarantee. If you're not satisfied with the plugin for any reason, contact our support team within 14 days of purchase for a full refund."
+              }
+            ].map((faq, index) => (
               <div key={index} className="py-6">
                 <div className="flex justify-between items-center">
                   <h3 className="text-xl font-medium">{faq.question}</h3>
