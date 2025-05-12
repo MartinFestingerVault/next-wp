@@ -2,13 +2,13 @@ import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-// Fixed case sensitivity in imports
 import { getFVPluginBySlug, getFeaturedMediaById } from "@/lib/wordpress";
 
-export async function generateMetadata({ 
-  params 
-}: { 
-  params: { slug: string } 
+// Generate metadata for the page
+export async function generateMetadata({
+  params
+}: {
+  params: { slug: string }
 }): Promise<Metadata> {
   try {
     const plugin = await getFVPluginBySlug(params.slug);
@@ -30,10 +30,11 @@ export async function generateMetadata({
   }
 }
 
-export default async function PluginPage({ 
-  params 
-}: { 
-  params: { slug: string } 
+// Rename to "Page" to match Next.js convention
+export default async function Page({
+  params
+}: {
+  params: { slug: string }
 }) {
   try {
     const plugin = await getFVPluginBySlug(params.slug);
