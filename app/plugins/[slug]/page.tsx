@@ -1,27 +1,19 @@
-import { getFvPluginBySlug, getAllFvPlugins, FvPlugin } from "@/lib/wordpress";
+import { getFvPluginBySlug, getAllFvPlugins } from "@/lib/wordpress";
 import { notFound } from "next/navigation";
 import { Section, Container, Article, Prose } from "@/components/craft";
 import { siteConfig } from "@/site.config";
 import Balancer from "react-wrap-balancer";
 import Link from "next/link";
 import Image from "next/image";
-// Removed date-fns dependency
-import type { Metadata } from "next";
-
-
 
 export async function generateStaticParams() {
   const plugins = await getAllFvPlugins();
-  return plugins.map((plugin: FvPlugin) => ({
+  return plugins.map((plugin) => ({
     slug: plugin.slug,
   }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}): Promise<Metadata> {
+export async function generateMetadata({ params }) {
   const { slug } = params;
   const plugin = await getFvPluginBySlug(slug);
   
@@ -60,11 +52,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function PluginDetailPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function PluginDetailPage({ params }) {
   const { slug } = params;
   const plugin = await getFvPluginBySlug(slug);
   
@@ -217,7 +205,7 @@ export default async function PluginDetailPage({
     },
     {
       question: "Can I use this plugin on multiple websites?",
-      answer: "The standard license allows usage on a single website. For multiple sites, you'll need to purchase additional licenses or consider our developer license option, which allows usage on multiple projects."
+      answer: "The standard license allows usage on a single website. For multiple sites, you&apos;ll need to purchase additional licenses or consider our developer license option, which allows usage on multiple projects."
     },
     {
       question: "How do I get support if I have questions?",
@@ -225,11 +213,11 @@ export default async function PluginDetailPage({
     },
     {
       question: "Will this plugin slow down my website?",
-      answer: "No, this plugin is optimized for performance. We've carefully developed it with efficiency in mind, using best coding practices to ensure minimal impact on your site's loading speed and server resources."
+      answer: "No, this plugin is optimized for performance. We&apos;ve carefully developed it with efficiency in mind, using best coding practices to ensure minimal impact on your site&apos;s loading speed and server resources."
     },
     {
       question: "Do you offer refunds?",
-      answer: "We offer a 14-day money-back guarantee. If you're not satisfied with the plugin for any reason, contact our support team within 14 days of purchase for a full refund."
+      answer: "We offer a 14-day money-back guarantee. If you&apos;re not satisfied with the plugin for any reason, contact our support team within 14 days of purchase for a full refund."
     }
   ];
 
@@ -494,7 +482,7 @@ export default async function PluginDetailPage({
                   
                   <h3>How to Get Support</h3>
                   <p>
-                    Once you've purchased the plugin, you'll receive access to our dedicated support portal where you can submit tickets and get assistance.
+                    Once you&apos;ve purchased the plugin, you&apos;ll receive access to our dedicated support portal where you can submit tickets and get assistance.
                   </p>
                 </Prose>
                 
