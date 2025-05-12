@@ -205,7 +205,7 @@ export default async function PluginDetailPage({ params }) {
     },
     {
       question: "Can I use this plugin on multiple websites?",
-      answer: "The standard license allows usage on a single website. For multiple sites, you&apos;ll need to purchase additional licenses or consider our developer license option, which allows usage on multiple projects."
+      answer: "The standard license allows usage on a single website. For multiple sites, you'll need to purchase additional licenses or consider our developer license option, which allows usage on multiple projects."
     },
     {
       question: "How do I get support if I have questions?",
@@ -213,11 +213,11 @@ export default async function PluginDetailPage({ params }) {
     },
     {
       question: "Will this plugin slow down my website?",
-      answer: "No, this plugin is optimized for performance. We&apos;ve carefully developed it with efficiency in mind, using best coding practices to ensure minimal impact on your site&apos;s loading speed and server resources."
+      answer: "No, this plugin is optimized for performance. We've carefully developed it with efficiency in mind, using best coding practices to ensure minimal impact on your site's loading speed and server resources."
     },
     {
       question: "Do you offer refunds?",
-      answer: "We offer a 14-day money-back guarantee. If you&apos;re not satisfied with the plugin for any reason, contact our support team within 14 days of purchase for a full refund."
+      answer: "We offer a 14-day money-back guarantee. If you're not satisfied with the plugin for any reason, contact our support team within 14 days of purchase for a full refund."
     }
   ];
 
@@ -229,7 +229,7 @@ export default async function PluginDetailPage({ params }) {
     <>
       {/* Hero Banner - Full Width Gradient Background */}
       <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white">
-        <Container className="py-16">
+        <div className="max-w-5xl mx-auto p-6 sm:p-8 py-16">
           <div className="flex flex-col md:flex-row gap-8 items-center">
             <div className="md:w-2/3">
               <div className="inline-flex items-center bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium mb-4">
@@ -328,7 +328,7 @@ export default async function PluginDetailPage({ params }) {
               Learn More
             </a>
           </div>
-        </Container>
+        </div>
       </div>
       
       {/* Feature Highlights - Alternating Layout with Colorful Icons */}
@@ -482,7 +482,7 @@ export default async function PluginDetailPage({ params }) {
                   
                   <h3>How to Get Support</h3>
                   <p>
-                    Once you&apos;ve purchased the plugin, you&apos;ll receive access to our dedicated support portal where you can submit tickets and get assistance.
+                    Once you have purchased the plugin, you will receive access to our dedicated support portal where you can submit tickets and get assistance.
                   </p>
                 </Prose>
                 
