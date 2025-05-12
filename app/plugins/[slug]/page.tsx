@@ -4,14 +4,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getFVPluginBySlug, getFeaturedMediaById } from "@/lib/wordpress";
 
-// Generate metadata for the page
-export async function generateMetadata({
-  params
-}: {
-  params: { slug: string }
-}): Promise<Metadata> {
+// Generate metadata for the page without complex types
+export async function generateMetadata(props) {
   try {
-    const plugin = await getFVPluginBySlug(params.slug);
+    const plugin = await getFVPluginBySlug(props.params.slug);
     
     return {
       title: `${plugin.title.rendered} | Festinger Vault`,
@@ -30,14 +26,10 @@ export async function generateMetadata({
   }
 }
 
-// Rename to "Page" to match Next.js convention
-export default async function Page({
-  params
-}: {
-  params: { slug: string }
-}) {
+// Default export without type annotations
+export default async function Page(props) {
   try {
-    const plugin = await getFVPluginBySlug(params.slug);
+    const plugin = await getFVPluginBySlug(props.params.slug);
     
     // Fetch featured media if available
     let featuredMedia = null;
