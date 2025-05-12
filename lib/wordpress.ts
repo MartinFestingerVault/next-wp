@@ -237,62 +237,51 @@ export async function searchAuthors(query: string): Promise<Author[]> {
 
 export { WordPressAPIError };
 
-// Add these functions at the end of the file
+// Add this code at the end of your lib/wordpress.ts file
+
+// Define the FvPlugin interface
+export interface FvPlugin {
+  id: number;
+  slug: string;
+  title: {
+    rendered: string;
+  };
+  content: {
+    rendered: string;
+  };
+  excerpt?: {
+    rendered: string;
+  };
+  meta?: {
+    version?: string;
+    custom_product_name?: string;
+    custom_product_url?: string;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
+// Define the default fetch options to match the rest of your API functions
+const defaultFetchOptions = {
+  headers: {
+    "User-Agent": "Next.js WordPress Client",
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+  },
+  next: {
+    tags: ["wordpress"],
+    revalidate: 3600, // 1 hour cache
+  },
+};
 
 // FV Plugins
-export async function getAllFvPlugins() {
-  try {
-    const response = await fetch(
-      `${process.env.WORDPRESS_URL}/wp-json/wp/v2/fv_plugin?per_page=100`,
-      {
-        ...defaultFetchOptions,
-        next: {
-          tags: ["wordpress", "fv_plugins"],
-        },
-      }
-    );
-    
-    if (!response.ok) {
-      throw new WordPressAPIError(
-        `Failed to fetch FV plugins. Status: ${response.status}`,
-        response.status,
-        "fv_plugin"
-      );
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching FV plugins:", error);
-    throw error;
-  }
+export async function getAllFvPlugins(): Promise<FvPlugin[]> {
+  const url = getUrl("/wp-json/wp/v2/fv_plugin", { per_page: 100 });
+  return wordpressFetch<FvPlugin[]>(url);
 }
 
-export async function getFvPluginBySlug(slug: string) {
-  try {
-    const response = await fetch(
-      `${process.env.WORDPRESS_URL}/wp-json/wp/v2/fv_plugin?slug=${slug}`,
-      {
-        ...defaultFetchOptions,
-        next: {
-          tags: ["wordpress", "fv_plugins"],
-        },
-      }
-    );
-    
-    if (!response.ok) {
-      throw new WordPressAPIError(
-        `Failed to fetch FV plugin by slug ${slug}. Status: ${response.status}`,
-        response.status,
-        `fv_plugin?slug=${slug}`
-      );
-    }
-    
-    const data = await response.json();
-    return data[0];
-  } catch (error) {
-    console.error(`Error fetching FV plugin by slug ${slug}:`, error);
-    throw error;
-  }
+export async function getFvPluginBySlug(slug: string): Promise<FvPlugin> {
+  const url = getUrl("/wp-json/wp/v2/fv_plugin", { slug });
+  const response = await wordpressFetch<FvPlugin[]>(url);
+  return response[0];
 }
-
-// Add similar functions for FV Themes, Template Kits, and Requests
