@@ -8,6 +8,8 @@ import Image from "next/image";
 // Removed date-fns dependency
 import type { Metadata } from "next";
 
+
+
 export async function generateStaticParams() {
   const plugins = await getAllFvPlugins();
   return plugins.map((plugin: FvPlugin) => ({
