@@ -1,29 +1,7 @@
-import { getAllFvPlugins } from "@/lib/wordpress";
+import { getAllFvPlugins, FvPlugin } from "@/lib/wordpress";
 import { Section, Container, Prose } from "@/components/craft";
 import Link from "next/link";
 import type { Metadata } from "next";
-
-// Define FvPlugin interface to match the type returned by getAllFvPlugins
-interface FvPlugin {
-  id: number;
-  slug: string;
-  title: {
-    rendered: string;
-  };
-  content: {
-    rendered: string;
-  };
-  excerpt?: {
-    rendered: string;
-  };
-  meta?: {
-    version?: string;
-    custom_product_name?: string;
-    custom_product_url?: string;
-    [key: string]: any;
-  };
-  [key: string]: any;
-}
 
 export const metadata: Metadata = {
   title: "Plugins",
