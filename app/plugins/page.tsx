@@ -1,40 +1,90 @@
-import { getAllFvPlugins, FvPlugin } from "@/lib/wordpress";
-import { Section, Container, Prose } from "@/components/craft";
-import Link from "next/link";
-import type { Metadata } from "next";
+// app/plugins/page.tsx
+import { Suspense } from "react";
+import { Metadata } from "next";
+import { PluginSearch } from "@/components/plugins/plugin-search";
+import { FilterPlugins } from "@/components/plugins/plugin-filter";
+import { PluginCard } from "@/components/plugins/plugin-card";
+import { 
+  getAllPlugins, 
+  getAllAccessLevels, 
+  getAllCategories,
+  getAllOriginalAuthors,
+  getAllTags 
+} from "@/lib/wordpress";
+
+interface PluginsPageProps {
+  searchParams: {
+    search?: string;
+    access_level?: string;
+    category?: string;
+    original_author?: string;
+    tag?: string;
+  };
+}
 
 export const metadata: Metadata = {
-  title: "Plugins",
-  description: "Browse all available plugins",
+  title: "WordPress Plugins | Festinger Vault",
+  description: "Browse our collection of premium WordPress plugins",
 };
 
-export default async function PluginsPage() {
-  const plugins = await getAllFvPlugins();
-
+export default async function PluginsPage({ searchParams }: PluginsPageProps) {
+  const { search, access_level, category, original_author, tag } = searchParams;
+  
+  // Fetch data in parallel
+  const [plugins, accessLevels, categories, originalAuthors, tags] = await Promise.all([
+    getAllPlugins({ 
+      search, 
+      access_level, 
+      category, 
+      original_author, 
+      tag 
+    }),
+    getAllAccessLevels(),
+    getAllCategories(),
+    getAllOriginalAuthors(),
+    getAllTags()
+  ]);
+  
   return (
-    <Section>
-      <Container>
-        <Prose>
-          <h1>Plugins</h1>
-          <p>Browse our collection of premium plugins.</p>
-        </Prose>
+    <div className="container mx-auto py-8">
+      <h1 className="mb-6 text-3xl font-bold">WordPress Plugins</h1>
+      
+      <div className="mb-8 space-y-6">
+        {/* Search */}
+        <div className="w-full md:max-w-md">
+          <PluginSearch defaultValue={search} />
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-          {plugins.map((plugin: FvPlugin) => (
-            <Link
-              href={`/plugins/${plugin.slug}`}
-              key={plugin.id}
-              className="block p-6 border rounded-lg hover:shadow-md transition-shadow bg-card"
-            >
-              <h2 className="text-xl font-semibold mb-2">{plugin.title.rendered}</h2>
-              <div 
-                className="text-muted-foreground"
-                dangerouslySetInnerHTML={{ __html: plugin.excerpt?.rendered || '' }}
-              />
-            </Link>
+        {/* Filters */}
+        <FilterPlugins
+          accessLevels={accessLevels}
+          categories={categories}
+          originalAuthors={originalAuthors}
+          tags={tags}
+          selectedAccessLevel={access_level}
+          selectedCategory={category}
+          selectedOriginalAuthor={original_author}
+          selectedTag={tag}
+        />
+      </div>
+      
+      {/* Results */}
+      {plugins.length === 0 ? (
+        <div className="py-12 text-center">
+          <h2 className="text-xl font-semibold">No plugins found</h2>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            Try adjusting your search or filter criteria
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {plugins.map((plugin) => (
+            <Suspense key={plugin.id} fallback={<div className="h-80 rounded-lg bg-gray-100 dark:bg-gray-800 animate-pulse"></div>}>
+              <PluginCard plugin={plugin} />
+            </Suspense>
           ))}
         </div>
-      </Container>
-    </Section>
+      )}
+    </div>
   );
 }
