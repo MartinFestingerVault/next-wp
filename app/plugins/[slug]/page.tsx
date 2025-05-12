@@ -1,12 +1,6 @@
 import { getFvPluginBySlug, getAllFvPlugins } from "@/lib/wordpress";
 import { notFound } from "next/navigation";
-
-// This defines the props type correctly for Next.js
-type PluginPageProps = {
-  params: {
-    slug: string;
-  };
-};
+import { Metadata } from "next";
 
 // Generate static params for all plugins
 export async function generateStaticParams() {
@@ -14,8 +8,12 @@ export async function generateStaticParams() {
   return plugins.map((plugin) => ({ slug: plugin.slug }));
 }
 
-// Change the type annotation to match the expected format
-export default async function PluginPage({ params }: PluginPageProps) {
+// Use the Next.js standard way without custom types
+export default async function PluginPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
   const plugin = await getFvPluginBySlug(params.slug);
 
   if (!plugin) {
@@ -46,4 +44,24 @@ export default async function PluginPage({ params }: PluginPageProps) {
       )}
     </div>
   );
+}
+
+// Optional: Generate metadata for the page
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const plugin = await getFvPluginBySlug(params.slug);
+  
+  if (!plugin) {
+    return {
+      title: 'Plugin Not Found',
+    };
+  }
+  
+  return {
+    title: plugin.title.rendered,
+    description: plugin.excerpt?.rendered || '',
+  };
 }
