@@ -4,10 +4,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getFVPluginBySlug, getFeaturedMediaById } from "@/lib/wordpress";
 
-// Generate metadata for the page without complex types
-export async function generateMetadata(props) {
+// Basic type for params
+type PageParams = {
+  params: {
+    slug: string;
+  };
+};
+
+// Generate metadata for the page with basic types
+export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   try {
-    const plugin = await getFVPluginBySlug(props.params.slug);
+    const plugin = await getFVPluginBySlug(params.slug);
     
     return {
       title: `${plugin.title.rendered} | Festinger Vault`,
@@ -26,10 +33,10 @@ export async function generateMetadata(props) {
   }
 }
 
-// Default export without type annotations
-export default async function Page(props) {
+// Default export with typed params
+export default async function Page({ params }: PageParams) {
   try {
-    const plugin = await getFVPluginBySlug(props.params.slug);
+    const plugin = await getFVPluginBySlug(params.slug);
     
     // Fetch featured media if available
     let featuredMedia = null;
