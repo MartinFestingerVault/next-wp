@@ -36,7 +36,7 @@ export async function generateMetadata({
     openGraph: {
       title: plugin.title.rendered,
       description: description,
-      type: "product",
+      type: "website", // Changed from "product" to "website" which is a valid type
       url: `${siteConfig.site_domain}/plugins/${plugin.slug}`,
       images: [
         {
@@ -94,11 +94,12 @@ export default async function PluginDetailPage({
             {/* Plugin Preview Image */}
             <div className="w-full md:w-2/5 lg:w-1/3 bg-accent/10 aspect-video rounded-lg border overflow-hidden flex items-center justify-center">
               {plugin.featured_media ? (
-                <img 
-                  src={`/api/media/${plugin.featured_media}`} 
-                  alt={plugin.title.rendered} 
-                  className="w-full h-full object-cover"
-                />
+                // Instead of using <img>, use a div with background image or just style differently
+                <div
+                  className="w-full h-full bg-cover bg-center"
+                  style={{ backgroundImage: `url('/api/media/${plugin.featured_media}')` }}
+                  aria-label={plugin.title.rendered}
+                ></div>
               ) : (
                 <div className="text-center p-8">
                   <h3 className="text-xl font-medium">{plugin.title.rendered}</h3>
