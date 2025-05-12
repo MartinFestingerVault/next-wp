@@ -446,3 +446,22 @@ export async function getAllAccessLevels(): Promise<FVAccessLevel[]> {
 }
 
 // Similar functions for other taxonomies (getAccessLevelById, getCategoryById, etc.)
+
+// Add these functions to lib/wordpress.ts
+
+export async function getAccessLevelById(id: number) {
+  const url = `${process.env.WORDPRESS_URL}/wp-json/wp/v2/fv_access_level/${id}`;
+  // Fetch and error handling logic
+}
+
+export async function getAllAccessLevels() {
+  const url = `${process.env.WORDPRESS_URL}/wp-json/wp/v2/fv_access_level?per_page=100`;
+  // Fetch and error handling logic
+}
+
+export async function getAllOriginalAuthors() {
+  const url = `${process.env.WORDPRESS_URL}/wp-json/wp/v2/original_author_tax?per_page=100`;
+  // Fetch and error handling logic
+}
+
+// Add other missing taxonomy functions
