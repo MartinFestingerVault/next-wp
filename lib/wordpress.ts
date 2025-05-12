@@ -10,6 +10,11 @@ import type {
   Page,
   Author,
   FeaturedMedia,
+  FVPlugin,
+  FVAccessLevel,
+  FVCategory,
+  FVOriginalAuthor,
+  FVTag
 } from "./wordpress.d";
 
 const baseUrl = process.env.WORDPRESS_URL;
@@ -18,12 +23,24 @@ if (!baseUrl) {
   throw new Error("WORDPRESS_URL environment variable is not defined");
 }
 
+// Default fetch options for all WordPress API calls
+const defaultFetchOptions = {
+  next: {
+    tags: ["wordpress"],
+    revalidate: 3600, // 1 hour cache
+  },
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
+};
+
 function getUrl(path: string, query?: Record<string, any>) {
   const params = query ? querystring.stringify(query) : null;
   return `${baseUrl}${path}${params ? `?${params}` : ""}`;
 }
 
-class WordPressAPIError extends Error {
+export class WordPressAPIError extends Error {
   constructor(message: string, public status: number, public endpoint: string) {
     super(message);
     this.name = "WordPressAPIError";
@@ -235,233 +252,119 @@ export async function searchAuthors(query: string): Promise<Author[]> {
   return wordpressFetch<Author[]>(url);
 }
 
-export { WordPressAPIError };
-
-// Add to lib/wordpress.ts
+// Festinger Vault Custom Post Types and Taxonomies
 
 // Fetch all plugins with optional filtering
-export async function getAllPlugins(filterParams?: { 
+export async function getAllFVPlugins(filterParams?: { 
   access_level?: string; 
   category?: string; 
   original_author?: string;
   tag?: string;
   search?: string;
 }): Promise<FVPlugin[]> {
-  let url = new URL(`${process.env.WORDPRESS_URL}/wp-json/wp/v2/fv_plugin`);
-  
-  // Add pagination params
-  url.searchParams.append("per_page", "100");
-  
-  // Add filter params if provided
-  if (filterParams) {
-    if (filterParams.access_level) {
-      url.searchParams.append("fv_access_level", filterParams.access_level);
-    }
-    if (filterParams.category) {
-      url.searchParams.append("fv_category", filterParams.category);
-    }
-    if (filterParams.original_author) {
-      url.searchParams.append("original_author_tax", filterParams.original_author);
-    }
-    if (filterParams.tag) {
-      url.searchParams.append("fv_tag", filterParams.tag);
-    }
-    if (filterParams.search) {
-      url.searchParams.append("search", filterParams.search);
-    }
+  const query: Record<string, any> = {
+    _embed: true,
+    per_page: 100,
+  };
+
+  if (filterParams?.search) {
+    query.search = filterParams.search;
+  }
+  if (filterParams?.access_level) {
+    query.fv_access_level = filterParams.access_level;
+  }
+  if (filterParams?.category) {
+    query.fv_category = filterParams.category;
+  }
+  if (filterParams?.original_author) {
+    query.original_author_tax = filterParams.original_author;
+  }
+  if (filterParams?.tag) {
+    query.fv_tag = filterParams.tag;
   }
 
-  try {
-    const response = await fetch(url.toString(), {
-      ...defaultFetchOptions,
-      next: {
-        tags: ["wordpress", "plugins"],
-        revalidate: 3600, // 1 hour cache
-      },
-    });
-
-    if (!response.ok) {
-      throw new WordPressAPIError(
-        `Failed to fetch plugins: ${response.statusText}`,
-        response.status,
-        url.toString()
-      );
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching plugins:", error);
-    throw error;
-  }
+  const url = getUrl("/wp-json/wp/v2/fv_plugin", query);
+  return wordpressFetch<FVPlugin[]>(url);
 }
 
 // Get a single plugin by ID
-export async function getPluginById(id: number): Promise<FVPlugin> {
-  const url = `${process.env.WORDPRESS_URL}/wp-json/wp/v2/fv_plugin/${id}`;
-
-  try {
-    const response = await fetch(url, {
-      ...defaultFetchOptions,
-      next: {
-        tags: ["wordpress", "plugins", `plugin-${id}`],
-        revalidate: 3600,
-      },
-    });
-
-    if (!response.ok) {
-      throw new WordPressAPIError(
-        `Failed to fetch plugin: ${response.statusText}`,
-        response.status,
-        url
-      );
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error(`Error fetching plugin with ID ${id}:`, error);
-    throw error;
-  }
+export async function getFVPluginById(id: number): Promise<FVPlugin> {
+  const url = getUrl(`/wp-json/wp/v2/fv_plugin/${id}`);
+  return wordpressFetch<FVPlugin>(url);
 }
 
 // Get a plugin by slug
-export async function getPluginBySlug(slug: string): Promise<FVPlugin> {
-  const url = `${process.env.WORDPRESS_URL}/wp-json/wp/v2/fv_plugin?slug=${slug}`;
-
-  try {
-    const response = await fetch(url, {
-      ...defaultFetchOptions,
-      next: {
-        tags: ["wordpress", "plugins", `plugin-slug-${slug}`],
-        revalidate: 3600,
-      },
-    });
-
-    if (!response.ok) {
-      throw new WordPressAPIError(
-        `Failed to fetch plugin: ${response.statusText}`,
-        response.status,
-        url
-      );
-    }
-
-    const plugins = await response.json();
-    
-    if (plugins.length === 0) {
-      throw new WordPressAPIError(
-        `No plugin found with slug: ${slug}`,
-        404,
-        url
-      );
-    }
-
-    return plugins[0];
-  } catch (error) {
-    console.error(`Error fetching plugin with slug ${slug}:`, error);
-    throw error;
+export async function getFVPluginBySlug(slug: string): Promise<FVPlugin> {
+  const url = getUrl("/wp-json/wp/v2/fv_plugin", { slug });
+  const response = await wordpressFetch<FVPlugin[]>(url);
+  
+  if (response.length === 0) {
+    throw new WordPressAPIError(
+      `No plugin found with slug: ${slug}`,
+      404,
+      url
+    );
   }
+  
+  return response[0];
 }
 
 // Get plugins by access level
-export async function getPluginsByAccessLevel(accessLevelId: number): Promise<FVPlugin[]> {
-  const url = `${process.env.WORDPRESS_URL}/wp-json/wp/v2/fv_plugin?fv_access_level=${accessLevelId}`;
-
-  try {
-    const response = await fetch(url, {
-      ...defaultFetchOptions,
-      next: {
-        tags: ["wordpress", "plugins", "access-levels", `access-level-${accessLevelId}`],
-        revalidate: 3600,
-      },
-    });
-
-    if (!response.ok) {
-      throw new WordPressAPIError(
-        `Failed to fetch plugins by access level: ${response.statusText}`,
-        response.status,
-        url
-      );
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error(`Error fetching plugins with access level ${accessLevelId}:`, error);
-    throw error;
-  }
+export async function getFVPluginsByAccessLevel(accessLevelId: number): Promise<FVPlugin[]> {
+  const url = getUrl("/wp-json/wp/v2/fv_plugin", { fv_access_level: accessLevelId });
+  return wordpressFetch<FVPlugin[]>(url);
 }
 
 // Get plugins by category
-export async function getPluginsByCategory(categoryId: number): Promise<FVPlugin[]> {
-  const url = `${process.env.WORDPRESS_URL}/wp-json/wp/v2/fv_plugin?fv_category=${categoryId}`;
-
-  try {
-    const response = await fetch(url, {
-      ...defaultFetchOptions,
-      next: {
-        tags: ["wordpress", "plugins", "categories", `category-${categoryId}`],
-        revalidate: 3600,
-      },
-    });
-
-    if (!response.ok) {
-      throw new WordPressAPIError(
-        `Failed to fetch plugins by category: ${response.statusText}`,
-        response.status,
-        url
-      );
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error(`Error fetching plugins with category ${categoryId}:`, error);
-    throw error;
-  }
+export async function getFVPluginsByCategory(categoryId: number): Promise<FVPlugin[]> {
+  const url = getUrl("/wp-json/wp/v2/fv_plugin", { fv_category: categoryId });
+  return wordpressFetch<FVPlugin[]>(url);
 }
 
 // Get all access levels
-export async function getAllAccessLevels(): Promise<FVAccessLevel[]> {
-  const url = `${process.env.WORDPRESS_URL}/wp-json/wp/v2/fv_access_level`;
-
-  try {
-    const response = await fetch(url, {
-      ...defaultFetchOptions,
-      next: {
-        tags: ["wordpress", "access-levels"],
-        revalidate: 3600,
-      },
-    });
-
-    if (!response.ok) {
-      throw new WordPressAPIError(
-        `Failed to fetch access levels: ${response.statusText}`,
-        response.status,
-        url
-      );
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching access levels:", error);
-    throw error;
-  }
+export async function getFVAccessLevels(): Promise<FVAccessLevel[]> {
+  const url = getUrl("/wp-json/wp/v2/fv_access_level");
+  return wordpressFetch<FVAccessLevel[]>(url);
 }
 
-// Similar functions for other taxonomies (getAccessLevelById, getCategoryById, etc.)
-
-// Add these functions to lib/wordpress.ts
-
-export async function getAccessLevelById(id: number) {
-  const url = `${process.env.WORDPRESS_URL}/wp-json/wp/v2/fv_access_level/${id}`;
-  // Fetch and error handling logic
+// Get access level by ID
+export async function getFVAccessLevelById(id: number): Promise<FVAccessLevel> {
+  const url = getUrl(`/wp-json/wp/v2/fv_access_level/${id}`);
+  return wordpressFetch<FVAccessLevel>(url);
 }
 
-export async function getAllAccessLevels() {
-  const url = `${process.env.WORDPRESS_URL}/wp-json/wp/v2/fv_access_level?per_page=100`;
-  // Fetch and error handling logic
+// Get all original authors
+export async function getFVOriginalAuthors(): Promise<FVOriginalAuthor[]> {
+  const url = getUrl("/wp-json/wp/v2/original_author_tax");
+  return wordpressFetch<FVOriginalAuthor[]>(url);
 }
 
-export async function getAllOriginalAuthors() {
-  const url = `${process.env.WORDPRESS_URL}/wp-json/wp/v2/original_author_tax?per_page=100`;
-  // Fetch and error handling logic
+// Get original author by ID
+export async function getFVOriginalAuthorById(id: number): Promise<FVOriginalAuthor> {
+  const url = getUrl(`/wp-json/wp/v2/original_author_tax/${id}`);
+  return wordpressFetch<FVOriginalAuthor>(url);
 }
 
-// Add other missing taxonomy functions
+// Get FV categories
+export async function getFVCategories(): Promise<FVCategory[]> {
+  const url = getUrl("/wp-json/wp/v2/fv_category");
+  return wordpressFetch<FVCategory[]>(url);
+}
+
+// Get FV category by ID
+export async function getFVCategoryById(id: number): Promise<FVCategory> {
+  const url = getUrl(`/wp-json/wp/v2/fv_category/${id}`);
+  return wordpressFetch<FVCategory>(url);
+}
+
+// Get FV tags
+export async function getFVTags(): Promise<FVTag[]> {
+  const url = getUrl("/wp-json/wp/v2/fv_tag");
+  return wordpressFetch<FVTag[]>(url);
+}
+
+// Get FV tag by ID
+export async function getFVTagById(id: number): Promise<FVTag> {
+  const url = getUrl(`/wp-json/wp/v2/fv_tag/${id}`);
+  return wordpressFetch<FVTag>(url);
+}
