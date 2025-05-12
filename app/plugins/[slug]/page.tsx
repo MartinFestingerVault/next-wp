@@ -96,15 +96,15 @@ export default async function PluginDetailPage({
     const diffInMonths = Math.floor(diffInDays / 30);
     
     if (diffInMonths > 0) {
-      return diffInMonths === 1 ? '1 month ago' : `${diffInMonths} months ago`;
+      return diffInMonths === 1 ? &apos;1 month ago&apos; : `${diffInMonths} months ago`;
     } else if (diffInDays > 0) {
-      return diffInDays === 1 ? '1 day ago' : `${diffInDays} days ago`;
+      return diffInDays === 1 ? &apos;1 day ago&apos; : `${diffInDays} days ago`;
     } else if (diffInHours > 0) {
-      return diffInHours === 1 ? '1 hour ago' : `${diffInHours} hours ago`;
+      return diffInHours === 1 ? &apos;1 hour ago&apos; : `${diffInHours} hours ago`;
     } else if (diffInMins > 0) {
-      return diffInMins === 1 ? '1 minute ago' : `${diffInMins} minutes ago`;
+      return diffInMins === 1 ? &apos;1 minute ago&apos; : `${diffInMins} minutes ago`;
     } else {
-      return 'just now';
+      return &apos;just now&apos;;
     }
   };
   
