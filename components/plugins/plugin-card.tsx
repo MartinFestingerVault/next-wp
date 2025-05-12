@@ -1,25 +1,19 @@
 // components/plugins/plugin-card.tsx
 import Image from "next/image";
 import Link from "next/link";
-import { FVPlugin } from "@/lib/wordpress";
-import { getFeaturedMediaById, getAccessLevelById, getCategoryById } from "@/lib/wordpress";
 import { Badge } from "@/components/ui/badge";
+import { getFeaturedMediaById, getCategoryById } from "@/lib/wordpress";
 
-interface PluginCardProps {
-  plugin: FVPlugin;
-}
-
-export async function PluginCard({ plugin }: PluginCardProps) {
-  // Fetch additional data in parallel
-  const [featuredMedia, accessLevel, category] = await Promise.all([
-    plugin.featured_media ? getFeaturedMediaById(plugin.featured_media) : null,
-    plugin.fv_access_level && plugin.fv_access_level.length > 0 
-      ? getAccessLevelById(plugin.fv_access_level[0]) 
-      : null,
-    plugin.fv_category && plugin.fv_category.length > 0 
-      ? getCategoryById(plugin.fv_category[0]) 
-      : null,
-  ]);
+// Simplified component with fewer dependencies
+export async function PluginCard({ plugin }: { plugin: any }) {
+  // Fetch featured media and one category if available
+  const featuredMedia = plugin.featured_media ? 
+    await getFeaturedMediaById(plugin.featured_media) : null;
+  
+  let category = null;
+  if (plugin.fv_category && plugin.fv_category.length > 0) {
+    category = await getCategoryById(plugin.fv_category[0]);
+  }
 
   // Format the date
   const formattedDate = new Date(plugin.modified).toLocaleDateString("en-US", {
@@ -61,8 +55,8 @@ export async function PluginCard({ plugin }: PluginCardProps) {
           </div>
         )}
         
-        {/* Version Badge */}
-        {plugin.meta.version && (
+        {/* Version Badge - only show if it exists */}
+        {plugin.meta?.version && (
           <Badge variant="secondary" className="absolute right-2 top-2">
             v{plugin.meta.version}
           </Badge>
@@ -70,18 +64,13 @@ export async function PluginCard({ plugin }: PluginCardProps) {
       </div>
       
       <div className="flex flex-1 flex-col p-4">
-        <div className="mb-2 flex items-center space-x-2">
-          {accessLevel && (
-            <Badge variant="outline" className="text-xs">
-              {accessLevel.name}
-            </Badge>
-          )}
-          {category && (
+        {category && (
+          <div className="mb-2">
             <Badge variant="outline" className="text-xs">
               {category.name}
             </Badge>
-          )}
-        </div>
+          </div>
+        )}
         
         <h3 
           className="mb-2 text-xl font-semibold"
@@ -94,7 +83,7 @@ export async function PluginCard({ plugin }: PluginCardProps) {
         />
         
         <div className="mt-auto flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-          <span>{plugin.meta.custom_author || "Unknown Author"}</span>
+          <span>{plugin.meta?.custom_author || "Unknown Author"}</span>
           <span>Updated: {formattedDate}</span>
         </div>
       </div>
