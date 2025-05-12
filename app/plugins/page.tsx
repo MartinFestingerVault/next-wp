@@ -11,8 +11,9 @@ import {
 } from "@/lib/wordpress";
 import { Badge } from "@/components/ui/badge";
 
+// Fix: Update the PageProps interface to align with Next.js app router expectations
 interface PageProps {
-  params: { [key: string]: string | string[] };
+  // Remove the params property from PageProps since it's not needed in the component signature
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
   description: "Browse our collection of premium WordPress plugins",
 };
 
+// Fix: Change the function signature to match the expected type by Next.js
 export default async function PluginsPage({ searchParams }: PageProps) {
   const search = searchParams.search as string | undefined;
   const access_level = searchParams.access_level as string | undefined;
